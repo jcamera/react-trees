@@ -17,8 +17,13 @@ class ControlPanel extends Component {
     this.state = {
       lstring: '',
       intervalId: null,
-      isAnimating: false
+      isAnimating: false,
+      isBranching: false
     }
+
+    this.allowedSymbols = ["f", "+", "-", "[", "]"];
+
+    this.numBranches = 0;
   }
   handleClick(e) {
     e.preventDefault();
@@ -26,14 +31,27 @@ class ControlPanel extends Component {
     if (!this.state.isAnimating) {
 
       this.state.intervalId = setInterval(() => {
-        let randVal = Math.floor(Math.random() * 3);
-        let randChar;
-        if (randVal === 0)
+        let randVal = Math.floor(Math.random() * this.allowedSymbols.length);
+        let randChar = this.allowedSymbols[randVal];
+        /*if (randVal === 0)
           randChar = 'f';
         else if (randVal === 1)
           randChar = '-';
         else if (randVal === 2)
-          randChar = '+';
+          randChar = '+';*/
+
+        if (!this.state.isBranching && (randChar === "[" || randChar === "]"))
+          return;
+
+        if (randChar === "[")
+          this.numBranches++;
+        else if (randChar === "]") {
+          if (this.numBranches > 0)
+            this.numBranches--;
+          else
+            return; //no states to restore
+
+        }
 
         this.setState({ lstring: this.state.lstring += randChar });
         //this.textArea.click();
@@ -56,11 +74,14 @@ class ControlPanel extends Component {
   }
 
   handleChange(e) {
-    e.preventDefault();
+    //e.preventDefault();
     //this.props.onDraw();
     console.log(e.target.value);
-    this.setState({ lstring: e.target.value });
-    this.drawingTurtle.draw(e.target.value);
+    const name = e.target.name;
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    //this.setState({ lstring: e.target.value });
+    this.setState({ [name]: value });
+    this.drawingTurtle.draw(this.state.lstring);
   }
 
   handleLengthChange(e) {
@@ -118,6 +139,7 @@ class ControlPanel extends Component {
         <label>
           lstring:
           <textarea id="lsystemTextInput"
+            name="lstring"
             value={this.state.lstring}
             onChange={this.handleChange}
             ref={ (input) => {this.textArea = input}}
@@ -135,6 +157,12 @@ class ControlPanel extends Component {
             min="2"
             max="48"
             onChange={this.handleAngleChange} />
+        </label>
+        <label>
+          branching:
+          <input name="isBranching" type="checkbox"
+            checked={this.state.isBranching}
+            onChange={this.handleChange}/>
         </label>
         <br/>
         <button id="drawButton" onClick={this.handleClick}>Animate</button>

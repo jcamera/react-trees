@@ -61,11 +61,13 @@ class DrawingTurtle2D {
 
   restoreState() {
     var turtleState = this.turtleStates.pop();
-    this.turtle.posX = turtleState.posX;
-    this.turtle.posY = turtleState.posY;
-    this.turtle.angle = turtleState.angle;
+    if (turtleState) {
+      this.turtle.posX = turtleState.posX;
+      this.turtle.posY = turtleState.posY;
+      this.turtle.angle = turtleState.angle;
 
-    this.ctx.moveTo(this.turtle.posX, this.turtle.posY);
+      this.ctx.moveTo(this.turtle.posX, this.turtle.posY);
+    }
   }
 
 /*
