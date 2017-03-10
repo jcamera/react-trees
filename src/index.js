@@ -9,8 +9,8 @@ import * as THREE from 'three';
 
 
 //put these in state
-var scene, camera, renderer;
-var geometry, material, mesh;
+//var scene, camera, renderer;
+//var geometry, material, mesh;
 
 
 /*
@@ -43,7 +43,7 @@ class ThreeCanvas extends React.Component {
 */
 
 ReactDOM.render(
-  <App onMakeGeometry={addRandomBox}/>,
+  <App/>,
   document.getElementById('root')
 );
 
@@ -56,6 +56,7 @@ ReactDOM.render(
 //init();
 //animate();
 
+/*
 function init() {
 
     scene = new THREE.Scene();
@@ -92,3 +93,4 @@ function animate() {
     renderer.render( scene, camera );
 
 }
+*/
