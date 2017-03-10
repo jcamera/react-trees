@@ -13,6 +13,16 @@ class DrawingTurtle2D {
     this.lstring = "";
     this.lineLength = 10;
     this.angleInc = Math.PI / 6;
+
+    this.commandMap = {
+      "f": this.drawForward,
+      "-": this.turnLeft,
+      "+": this.turnRight,
+      "[": this.saveState,
+      "]": this.restoreState
+    }
+
+    this.turtleStates = [];
   }
 
   drawForward() {
@@ -36,6 +46,26 @@ class DrawingTurtle2D {
     this.turtle.angle = Math.PI * 3 / 2;
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.turtleStates = [];
+  }
+
+  saveState() {
+    this.turtleStates.push({
+      posX: this.turtle.posX,
+      posY: this.turtle.posY,
+      angle: this.turtle.angle
+    });
+    //console.log(this.turtleStates);
+  }
+
+  restoreState() {
+    var turtleState = this.turtleStates.pop();
+    this.turtle.posX = turtleState.posX;
+    this.turtle.posY = turtleState.posY;
+    this.turtle.angle = turtleState.angle;
+
+    this.ctx.moveTo(this.turtle.posX, this.turtle.posY);
   }
 
 /*
@@ -56,6 +86,10 @@ class DrawingTurtle2D {
 
     for (var i=0; i<this.lstring.length; i++) {
       var thisChar = this.lstring[i];
+      if (thisChar in this.commandMap) {
+        this.commandMap[thisChar].apply(this);
+      }
+      /*
       if (thisChar === 'f') {
         this.drawForward();
       }
@@ -65,6 +99,7 @@ class DrawingTurtle2D {
       else if (thisChar === '-') {
         this.turnLeft();
       }
+      */
     }
 
     this.ctx.stroke();
