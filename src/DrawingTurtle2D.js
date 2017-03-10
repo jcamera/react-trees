@@ -11,13 +11,13 @@ class DrawingTurtle2D {
     }
     this.ctx = this.canvas.getContext('2d');
     this.lstring = "";
-    this.length = 10;
+    this.lineLength = 10;
     this.angleInc = Math.PI / 6;
   }
 
   drawForward() {
-    this.turtle.posX += Math.cos(this.turtle.angle) * this.length;
-    this.turtle.posY += Math.sin(this.turtle.angle) * this.length;
+    this.turtle.posX += Math.cos(this.turtle.angle) * this.lineLength;
+    this.turtle.posY += Math.sin(this.turtle.angle) * this.lineLength;
     this.ctx.lineTo(this.turtle.posX, this.turtle.posY);
 
   }
@@ -38,6 +38,15 @@ class DrawingTurtle2D {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
+/*
+  set lineLength(x) {
+    //this.lineLength = x;
+  }
+
+  set angle(x) {
+    //this.angle = x;
+  }
+*/
   draw(lstring) {
     this.lstring = lstring;
 

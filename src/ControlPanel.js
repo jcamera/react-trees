@@ -9,6 +9,8 @@ class ControlPanel extends Component {
     this.handleClick = this.handleClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleClickReset = this.handleClickReset.bind(this);
+    this.handleLengthChange = this.handleLengthChange.bind(this);
+    this.handleAngleChange = this.handleAngleChange.bind(this);
 
     this.drawingTurtle = new DrawingTurtle2D();
 
@@ -61,6 +63,21 @@ class ControlPanel extends Component {
     this.drawingTurtle.draw(e.target.value);
   }
 
+  handleLengthChange(e) {
+    e.preventDefault();
+    //this.props.onDraw();
+    console.log(e.target.value);
+    //this.setState({ lstring: e.target.value });
+    this.drawingTurtle.lineLength = e.target.value;
+    this.drawingTurtle.draw(this.state.lstring);
+  }
+
+  handleAngleChange(e) {
+    console.log(e.target.value);
+    this.drawingTurtle.angleInc = Math.PI / e.target.value;
+    this.drawingTurtle.draw(this.state.lstring);
+  }
+
   animateDraw() {
     window.setTimeout(function() {
       this.drawingTurtle.draw(this.state.lstring);
@@ -107,8 +124,22 @@ class ControlPanel extends Component {
             style={lstringInputStyle}
             />
         </label>
+        <label>
+          line:
+          <input id="lengthInput" type="range" min="1" max="100"
+            onChange={this.handleLengthChange}/>
+        </label>
+        <label>
+          angle:
+          <input id="angleInput" type="range"
+            min="2"
+            max="48"
+            onChange={this.handleAngleChange} />
+        </label>
+        <br/>
         <button id="drawButton" onClick={this.handleClick}>Animate</button>
         <button id="resetButton" onClick={this.handleClickReset}>Reset</button>
+
       </form>
     );
   }
