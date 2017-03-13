@@ -25,10 +25,11 @@ class DrawingTurtle2D {
     this.turtleStates = [];
   }
 
-  drawForward() {
+  drawForward(arg) {
     this.turtle.posX += Math.cos(this.turtle.angle) * this.lineLength;
     this.turtle.posY += Math.sin(this.turtle.angle) * this.lineLength;
-    this.ctx.lineTo(this.turtle.posX, this.turtle.posY);
+    if (arg !== 'nodraw')
+      this.ctx.lineTo(this.turtle.posX, this.turtle.posY);
 
   }
 
@@ -105,6 +106,72 @@ class DrawingTurtle2D {
     }
 
     this.ctx.stroke();
+  }
+
+  getDrawingExtent(lstring) {
+    this.lstring = lstring;
+
+    this.reset();
+
+    var extent = {
+      minX: this.turtle.posX,
+      maxX: this.turtle.posX,
+      minY: this.turtle.posY,
+      maxY: this.turtle.posY
+    };
+
+    for (var i=0; i<this.lstring.length; i++) {
+      var thisChar = this.lstring[i];
+      if (thisChar in this.commandMap) {
+        if (thisChar === 'f') {
+          this.drawForward('nodraw');
+          var posX = this.turtle.posX;
+          var posY = this.turtle.posY;
+          if (posX < extent.minX)
+            extent.minX = posX;
+          if (posX > extent.maxX)
+            extent.maxX = posX;
+          if (posY < extent.minY)
+            extent.minY = posY;
+          if (posY > extent.maxY)
+            extent.maxY = posY;
+        }
+        else
+          this.commandMap[thisChar].apply(this);
+      }
+    }
+    return extent;
+  }
+
+  distanceToObject(lstring, destX, destY) {
+    this.lstring = lstring;
+
+    this.reset();
+
+    var minDistance = this.canvas.width;
+
+    for (var i=0; i<this.lstring.length; i++) {
+      var thisChar = this.lstring[i];
+      if (thisChar in this.commandMap) {
+        if (thisChar === 'f') {
+          this.drawForward('nodraw');
+          var posX = this.turtle.posX;
+          var posY = this.turtle.posY;
+          var dist = this.getDistance(posX, posY, destX, destY);
+          if (dist < minDistance)
+            minDistance = dist;
+        }
+        else
+          this.commandMap[thisChar].apply(this);
+      }
+    }
+    return minDistance;
+  }
+
+  getDistance(x1, y1, x2, y2) {
+    var xdiff = x1-x2;
+    var ydiff = y1-y2;
+    return Math.sqrt(xdiff*xdiff + ydiff*ydiff);
   }
 }
 
