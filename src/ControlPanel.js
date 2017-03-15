@@ -72,40 +72,61 @@ class ControlPanel extends Component {
       this.setState( {
         lstring: best.lstring,
         axiom: best.axiom,
-        frule: best.frule
+        frule: best.frule,
+        stats: best.stats
       } );
+
       this.drawingTurtle.draw(best.lstring);
       return;
     }
 
-    if (!this.state.isAnimating) {
+    if (e.target.name === 'animate') {
+      if (!this.state.isAnimating) {
 
-      this.state.intervalId = setInterval(() => {
-        let randVal = Math.floor(Math.random() * this.allowedSymbols.length);
-        let randChar = this.allowedSymbols[randVal];
+        this.state.intervalId = setInterval(() => {
+          let randVal = Math.floor(Math.random() * this.allowedSymbols.length);
+          let randChar = this.allowedSymbols[randVal];
 
-        if (!this.state.isBranching && (randChar === "[" || randChar === "]"))
-          return;
+          if (!this.state.isBranching && (randChar === "[" || randChar === "]"))
+            return;
 
-        if (randChar === "[")
-          this.numBranches++;
-        else if (randChar === "]") {
-          if (this.numBranches > 0)
-            this.numBranches--;
-          else
-            return; //no states to restore
+          if (randChar === "[")
+            this.numBranches++;
+          else if (randChar === "]") {
+            if (this.numBranches > 0)
+              this.numBranches--;
+            else
+              return; //no states to restore
 
-        }
-        this.setState({ lstring: this.state.lstring += randChar });
-        //this.textArea.click();
-        this.drawingTurtle.draw(this.state.lstring);
-      },20);
+          }
+          this.setState({ lstring: this.state.lstring += randChar });
+          //this.textArea.click();
+          this.drawingTurtle.draw(this.state.lstring);
+        },20);
 
-      this.state.isAnimating = true;
+        this.state.isAnimating = true;
+      }
+      else {
+        clearInterval(this.state.intervalId);
+        this.state.isAnimating = false;
+      }
     }
-    else {
-      clearInterval(this.state.intervalId);
-      this.state.isAnimating = false;
+
+    if (e.target.name === 'moveUp') {
+      this.drawingTurtle.moveUp();
+      this.drawingTurtle.draw(this.state.lstring);
+    }
+    if (e.target.name === 'moveDown') {
+      this.drawingTurtle.moveDown();
+      this.drawingTurtle.draw(this.state.lstring);
+    }
+    if (e.target.name === 'moveLeft') {
+      this.drawingTurtle.moveLeft();
+      this.drawingTurtle.draw(this.state.lstring);
+    }
+    if (e.target.name === 'moveRight') {
+      this.drawingTurtle.moveRight();
+      this.drawingTurtle.draw(this.state.lstring);
     }
   }
 
@@ -200,13 +221,18 @@ class ControlPanel extends Component {
 
     const controlBlockStyle = {
       border: '1px solid #999',
-      padding: '6px'
+      padding: '6px',
+      fontSize: '13px'
     }
+
+    let stats = this.state.stats ? Object.keys(this.state.stats).map((key) => {
+      return <span>{key}: {this.state.stats[key]}  </span>;
+    }) : null;
+
 
     return (
       <div>
-        <label>
-          instructions:
+        <label htmlFor="lsystemTextInput">instructions:</label>
           <input id="lsystemTextInput"
             name="lstring"
             type="text"
@@ -214,36 +240,48 @@ class ControlPanel extends Component {
             onChange={this.handleChange}
             style={lstringInputStyle}
             />
-        </label>
-        <label>
-          line:
-          <input id="lengthInput" type="range" min="1" max="100"
-            onChange={this.handleLengthChange}/>
-        </label>
-        <label>
-          angle:
-          <input id="angleInput" type="range"
-            min="2"
-            max="48"
-            onChange={this.handleAngleChange} />
-        </label>
-        <br/>
-        <button id="drawButton" onClick={this.handleClick}>Animate</button>
-        branching:
-        <input name="isBranching" type="checkbox"
-          checked={this.state.isBranching}
-          onChange={this.handleChange}/>
-        <button id="resetButton" onClick={this.handleClickReset}>Reset</button>
+
         <div style={controlBlockStyle}>
-          <input name="axiom" type="text"
+          <label htmlFor="lengthInput">line:</label>
+            <input id="lengthInput" type="range" min="1" max="100"
+              onChange={this.handleLengthChange}/>
+          <label htmlFor="angleInput">angle:</label>
+            <input id="angleInput" type="range"
+              min="2"
+              max="48"
+              onChange={this.handleAngleChange} />
+          <button name="moveUp" onClick={this.handleClick}>&#8593;</button>
+          <button name="moveDown" onClick={this.handleClick}>&#8595;</button>
+          <button name="moveLeft" onClick={this.handleClick}>&#8592;</button>
+          <button name="moveRight" onClick={this.handleClick}>&#8594;</button>
+        </div>
+        <div style={controlBlockStyle}>
+          <button id="drawButton" name="animate" onClick={this.handleClick}>Animate</button>
+          <button id="resetButton" onClick={this.handleClickReset}>Reset</button>
+          <label htmlFor="branchingCheckbox">branching:</label>
+          <input name="isBranching" type="checkbox" id="branchingCheckbox"
+            checked={this.state.isBranching}
+            onChange={this.handleChange}/>
+        </div>
+        <div style={controlBlockStyle}>
+          <label htmlFor="axiomInput">axiom: </label>
+          <input name="axiom" type="text" id="axiomInput"
             onChange={this.handleChange} value={this.state.axiom}/>
-          <input name="frule" type="text"
+          <label htmlFor="rulesInput">rules: </label>
+          <input name="frule" type="text" id="rulesInput"
             onChange={this.handleChange} value={this.state.frule}/>
-          <input name="iterations" type="number" min="1" max="20" onChange={this.handleChange}
-            value={this.state.iterations}/>
+          <label htmlFor="iterationsInput">iterations: </label>
+          <input name="iterations" type="number" min="1" max="20" id="iterationsInput"
+          onChange={this.handleChange} value={this.state.iterations}/>
           <button name="generate" onClick={this.handleClick}>Generate</button>
-          <button name="makePopulation" onClick={this.handleClick}>Make Population</button>
+          <button name="makePopulation" onClick={this.handleClick}>Init Population</button>
           <button name="makeNewGeneration" onClick={this.handleClick}>New Generation</button>
+        </div>
+        <div style={controlBlockStyle}>
+          <label>stats: </label>
+          <div id="statsOutput">
+            { stats }
+          </div>
         </div>
       </div>
     );

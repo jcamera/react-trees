@@ -34,6 +34,8 @@ class Generator {
     console.log("Generator - make population");
 
     this.populationSize = size;
+    this.population = [];
+    this.bestIndividual = null;
 
     //build randomPopulation
     for (var i=0; i<size; i++) {
@@ -58,8 +60,10 @@ class Generator {
 
     //make new population starting with this individual
     var nextGeneration = [individual];
+    //try without automatically including winner
+    //var nextGeneration = [];
 
-    for (var i=1; i<this.population.length; i++) {
+    for (var i=0; i<this.population.length; i++) {
       //try tournament selection
       var parent = this.selectParent(); //select from current population
 
@@ -80,7 +84,7 @@ class Generator {
     //console.log("new child: ", child);
 
     //mutate child with probability 1 / # of chars
-    var prob = 1 / (parent.axiom.length + parent.frule.length);
+    var prob = 1 / (parent.axiom.length + parent.frule.length/2);
     child.frule = this.mutate(child.frule, prob);
 
     return child;
@@ -221,7 +225,7 @@ class Generator {
 
     //very basic fitness criteria - count f's
 
-    /*
+
     var numBranches = 0; //which include an f
     for (var i=0; i<lstring.length; i++) {
       if (lstring[i] === '[') {
@@ -243,13 +247,20 @@ class Generator {
         }
       }
     }
-    fitness = numBranches;
-    */
+    //fitness = numBranches;
+
 
     //get minmax from drawingTurtle
     var extent = this.drawingTurtle.getDrawingExtent(lstring);
+    var startPos = this.drawingTurtle.getStartPos();
     //console.log('extent: ', extent);
-    fitness = Math.abs(extent.maxX - extent.minX) * Math.abs(extent.maxY - extent.minY);
+    //fitness = Math.abs(extent.maxX - extent.minX) * Math.abs(extent.maxY - extent.minY);
+
+    //check if well-balanced, horizontally
+
+    //fitness = (extent.maxY - extent.minY)/2 * numBranches;
+
+    fitness = extent.maxY*6 + extent.maxX-extent.minX + numBranches;
 
     //get distance to some point
     //fitness = 1 / this.drawingTurtle.distanceToObject(lstring, 0, 0);
@@ -261,6 +272,13 @@ class Generator {
     if (!this.bestIndividual || (individual.fitness > this.bestIndividual.fitness)) {
       this.bestIndividual = individual;
       console.log('new best: ', individual);
+
+      //add stats to best
+      this.bestIndividual.stats = {
+        branches: numBranches,
+        height: extent.maxY - extent.minY,
+        width: extent.maxX - extent.minX
+      }
     }
 
   }

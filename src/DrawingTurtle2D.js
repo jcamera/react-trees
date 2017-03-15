@@ -4,9 +4,12 @@ class DrawingTurtle2D {
   constructor() {
     this.canvas = document.getElementById("mainCanvas");
 
+    this.startX = this.canvas.width/2;
+    this.startY = this.canvas.height/2;
+
     this.turtle = {
-      posX: this.canvas.width/2,
-      posY: this.canvas.height/2,
+      posX: this.startX,
+      posY: this.startY,
       angle: Math.PI * 3 / 2
     }
     this.ctx = this.canvas.getContext('2d');
@@ -42,8 +45,10 @@ class DrawingTurtle2D {
   }
 
   reset() {
-    this.turtle.posX = this.canvas.width/2;
-    this.turtle.posY = this.canvas.height/2;
+    //this.turtle.posX = this.canvas.width/2;
+    //this.turtle.posY = this.canvas.height/2;
+    this.turtle.posX = this.startX;
+    this.turtle.posY = this.startY;
     this.turtle.angle = Math.PI * 3 / 2;
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -172,6 +177,28 @@ class DrawingTurtle2D {
     var xdiff = x1-x2;
     var ydiff = y1-y2;
     return Math.sqrt(xdiff*xdiff + ydiff*ydiff);
+  }
+
+  getStartPos() {
+    return { x: this.startX, y: this.startY};
+  }
+
+  setStartPos(x, y) {
+    this.startX = x;
+    this.startY = y;
+  }
+
+  moveUp() {
+    this.startY -= 10;
+  }
+  moveDown() {
+    this.startY += 10;
+  }
+  moveLeft() {
+    this.startX -= 10;
+  }
+  moveRight() {
+    this.startX += 10;
   }
 }
 
