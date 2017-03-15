@@ -18,7 +18,7 @@ class Generator {
     this.symbols = ['f','+','-','[',']'];
     this.numIterations = 3;
     this.bestIndividual = null;
-    this.populationSize = 20;
+    this.populationSize = 40;
     this.tournamentSize = 3;
 
     //this.drawingTurtle = new DrawingTurtle2D();

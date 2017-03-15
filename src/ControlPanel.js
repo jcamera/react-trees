@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import DrawingTurtle2D from './DrawingTurtle2D';
+import DrawingTurtle3D from './DrawingTurtle3D';
 import Generator from './Generator';
 
 
@@ -14,6 +15,7 @@ class ControlPanel extends Component {
     this.handleAngleChange = this.handleAngleChange.bind(this);
 
     this.drawingTurtle = new DrawingTurtle2D();
+    this.drawingTurtle3d = null;
     this.generator = new Generator(this.drawingTurtle);
 
     this.state = {
@@ -128,6 +130,13 @@ class ControlPanel extends Component {
       this.drawingTurtle.moveRight();
       this.drawingTurtle.draw(this.state.lstring);
     }
+
+    if (e.target.name === 'make3d') {
+      if (this.drawingTurtle3d === null)
+        this.drawingTurtle3d = new DrawingTurtle3D();
+      this.drawingTurtle3d.draw(this.state.lstring);
+      this.drawingTurtle3d.animate();
+    }
   }
 
   handleClickReset(e) {
@@ -221,9 +230,21 @@ class ControlPanel extends Component {
 
     const controlBlockStyle = {
       border: '1px solid #999',
+      borderTop: '0',
       padding: '6px',
-      fontSize: '13px'
+      fontSize: '13px',
+      marginBottom: '5px'
     }
+
+    let animateButtonStyle;
+    if (this.state.isAnimating)
+      animateButtonStyle = {
+        backgroundColor : 'rgb(192, 0, 0)'
+      };
+    else
+      animateButtonStyle = {
+        backgroundColor : 'rgb(192, 192, 192)'
+      };
 
     let stats = this.state.stats ? Object.keys(this.state.stats).map((key) => {
       return <span>{key}: {this.state.stats[key]}  </span>;
@@ -232,15 +253,16 @@ class ControlPanel extends Component {
 
     return (
       <div>
-        <label htmlFor="lsystemTextInput">instructions:</label>
-          <input id="lsystemTextInput"
-            name="lstring"
-            type="text"
-            value={this.state.lstring}
-            onChange={this.handleChange}
-            style={lstringInputStyle}
-            />
-
+        <div style={controlBlockStyle}>
+          <label htmlFor="lsystemTextInput">instructions:</label>
+            <input id="lsystemTextInput"
+              name="lstring"
+              type="text"
+              value={this.state.lstring}
+              onChange={this.handleChange}
+              style={lstringInputStyle}
+              />
+          </div>
         <div style={controlBlockStyle}>
           <label htmlFor="lengthInput">line:</label>
             <input id="lengthInput" type="range" min="1" max="100"
@@ -271,17 +293,17 @@ class ControlPanel extends Component {
           <input name="frule" type="text" id="rulesInput"
             onChange={this.handleChange} value={this.state.frule}/>
           <label htmlFor="iterationsInput">iterations: </label>
-          <input name="iterations" type="number" min="1" max="20" id="iterationsInput"
+          <input name="iterations" type="number" min="1" max="8" id="iterationsInput"
           onChange={this.handleChange} value={this.state.iterations}/>
           <button name="generate" onClick={this.handleClick}>Generate</button>
-          <button name="makePopulation" onClick={this.handleClick}>Init Population</button>
-          <button name="makeNewGeneration" onClick={this.handleClick}>New Generation</button>
         </div>
         <div style={controlBlockStyle}>
-          <label>stats: </label>
-          <div id="statsOutput">
-            { stats }
-          </div>
+        <button name="makePopulation" onClick={this.handleClick}>Initialize Population</button>
+        <button name="makeNewGeneration" onClick={this.handleClick}>New Generation</button>
+        <button name="make3d" onClick={this.handleClick}>Make 3d</button>
+        </div>
+        <div>
+            <label>stats: </label> { stats }
         </div>
       </div>
     );

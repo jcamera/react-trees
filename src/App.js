@@ -14,7 +14,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <h1>Growing Images</h1>
+        <h1>Generative Drawing with React</h1>
         <ControlPanel
           onDraw={() => this.drawFrame()}
           />
