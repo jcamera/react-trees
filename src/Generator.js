@@ -2,9 +2,10 @@ import DrawingTurtle2D from './DrawingTurtle2D';
 
 
 class Individual {
-  constructor(axiom, frule) {
+  constructor(axiom, frule, xrule) {
     this.axiom = axiom || '';
     this.frule = frule || '';
+    this.xrule = xrule || '';
     this.fitness = 0;
     this.lstring = '';
   }
@@ -15,7 +16,7 @@ class Generator {
     this.population = [];
     this.maxRuleDepth = 2;
     this.maxRuleLength = 10;
-    this.symbols = ['f','+','-','[',']'];
+    this.symbols = ['f','+','-','[',']','x'];
     this.numIterations = 3;
     this.bestIndividual = null;
     this.populationSize = 40;
@@ -41,8 +42,10 @@ class Generator {
     for (var i=0; i<size; i++) {
       var ind = new Individual();
       //ind.axiom = this.randomRule();
-      ind.axiom = 'f';
+      //ind.axiom = 'f';
+      ind.axiom = this.randomRule(2);;
       ind.frule = this.randomRule(this.maxRuleDepth);
+      ind.xrule = this.randomRule(this.maxRuleDepth);
       console.log('rule: ', ind.frule);
       this.evaluate(ind);
       this.population.push(ind);
@@ -84,8 +87,11 @@ class Generator {
     //console.log("new child: ", child);
 
     //mutate child with probability 1 / # of chars
-    var prob = 1 / (parent.axiom.length + parent.frule.length/2);
+    //var prob = 1 / ((parent.axiom.length + parent.frule.length + parent.xrule.length)/4);
+    var prob = 1;
+    child.axiom = this.mutate(child.axiom, prob);
     child.frule = this.mutate(child.frule, prob);
+    child.xrule = this.mutate(child.xrule, prob);
 
     return child;
   }
@@ -99,6 +105,8 @@ class Generator {
     while (pos < str.length) {
       if (Math.random() < prob && str[pos] !== ']') {
         //change symbol at this position
+
+        console.log('yes mutate');
 
         var endPos = pos+1; //end of thing we're inserting
 
@@ -116,7 +124,7 @@ class Generator {
           }
         }
 
-        var randIndex = Math.floor(Math.random() * 4);
+        var randIndex = Math.floor(Math.random() * 5);
         var newPart = '';
         switch (randIndex) {
           case 0:
@@ -130,6 +138,9 @@ class Generator {
             break;
           case 3:
             newPart = '[' + this.randomRule(1) + ']';
+            break;
+          case 4:
+            newPart = 'x';
             break;
           default:
             break;
@@ -189,6 +200,9 @@ class Generator {
             rule += '[' + this.randomRule(maxDepth-1) + ']';
           break;
         case 4:
+          rule += 'x';
+          break;
+        case 5:
           return rule;
         default:
           break;
@@ -216,7 +230,7 @@ class Generator {
 
   //evaluate fitness of Individual
   evaluate(individual) {
-    var lstring = this.generateLString(individual.axiom, individual.frule);
+    var lstring = this.generateLString(individual.axiom, individual.frule, individual.xrule);
     individual.lstring = lstring;
     //console.log('eval: ', lstring);
 
@@ -260,10 +274,12 @@ class Generator {
 
     //fitness = (extent.maxY - extent.minY)/2 * numBranches;
 
-    fitness = extent.maxY*6 + extent.maxX-extent.minX + numBranches;
+    var distance = this.drawingTurtle.distanceToObject(lstring, startPos.x, 0)
+
+    fitness = extent.maxY*2 + extent.maxX-extent.minX + numBranches*.5 - distance;
 
     //get distance to some point
-    //fitness = 1 / this.drawingTurtle.distanceToObject(lstring, 0, 0);
+    //fitness *=  (1 - (1 / (this.drawingTurtle.distanceToObject(lstring, startPos.x, 0) + 0.0001))); //make sure no divide by 0
 
     individual.fitness = fitness;
     console.log('fitness: ', fitness);
@@ -283,7 +299,7 @@ class Generator {
 
   }
 
-  generateLString(axiom, frule) {
+  generateLString(axiom, frule, xrule) {
     var lstring = '';
     if (axiom && frule) {
       //for every iteration
@@ -294,6 +310,8 @@ class Generator {
         for (var j=0; j<lstring.length; j++) {
           if (lstring[j] === 'f')
             tempStr += frule;
+          else if (lstring[j] === 'x')
+            tempStr += xrule;
           else
             tempStr += lstring[j];
         }

@@ -34,7 +34,7 @@ class DrawingTurtle3D {
 
     this.turtle = {
       posX: 0,
-      posY: 0,
+      posY: -window.innerHeight/2,
       angle: Math.PI / 2
       //angle: 0
     }
@@ -109,6 +109,8 @@ class DrawingTurtle3D {
       this.turtle.posX = turtleState.posX;
       this.turtle.posY = turtleState.posY;
       this.turtle.angle = turtleState.angle;
+
+      //this.lines.push(new THREE.Line( this.geometry, this.material));
 
       //this.ctx.moveTo(this.turtle.posX, this.turtle.posY);
     }

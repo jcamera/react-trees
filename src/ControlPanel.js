@@ -25,6 +25,7 @@ class ControlPanel extends Component {
       isBranching: false,
       axiom: '',
       frule: '',
+      xrule: '',
       iterations: 3
     }
 
@@ -58,16 +59,16 @@ class ControlPanel extends Component {
 
     if (e.target.name === 'generate') {
       //this.generateLString();
-      let lstring = this.generator.generateLString(this.state.axiom, this.state.frule);
+      let lstring = this.generator.generateLString(this.state.axiom, this.state.frule, this.state.xrule);
       this.setState({ lstring: lstring });
       this.drawingTurtle.draw(lstring);
       return;
     }
-    if (e.target.name === 'makePopulation') {
-      this.generator.makePopulation(10);
+    else if (e.target.name === 'makePopulation') {
+      this.generator.makePopulation(20);
       return;
     }
-    if (e.target.name === 'makeNewGeneration') {
+    else if (e.target.name === 'makeNewGeneration') {
       this.generator.makeNewGeneration();
       var best = this.generator.getBest();
       console.log('best: ', best);
@@ -75,14 +76,14 @@ class ControlPanel extends Component {
         lstring: best.lstring,
         axiom: best.axiom,
         frule: best.frule,
+        xrule: best.xrule,
         stats: best.stats
       } );
 
       this.drawingTurtle.draw(best.lstring);
       return;
     }
-
-    if (e.target.name === 'animate') {
+    else if (e.target.name === 'animate') {
       if (!this.state.isAnimating) {
 
         this.state.intervalId = setInterval(() => {
@@ -113,25 +114,23 @@ class ControlPanel extends Component {
         this.state.isAnimating = false;
       }
     }
-
-    if (e.target.name === 'moveUp') {
+    else if (e.target.name === 'moveUp') {
       this.drawingTurtle.moveUp();
       this.drawingTurtle.draw(this.state.lstring);
     }
-    if (e.target.name === 'moveDown') {
+    else if (e.target.name === 'moveDown') {
       this.drawingTurtle.moveDown();
       this.drawingTurtle.draw(this.state.lstring);
     }
-    if (e.target.name === 'moveLeft') {
+    else if (e.target.name === 'moveLeft') {
       this.drawingTurtle.moveLeft();
       this.drawingTurtle.draw(this.state.lstring);
     }
-    if (e.target.name === 'moveRight') {
+    else if (e.target.name === 'moveRight') {
       this.drawingTurtle.moveRight();
       this.drawingTurtle.draw(this.state.lstring);
     }
-
-    if (e.target.name === 'make3d') {
+    else if (e.target.name === 'make3d') {
       if (this.drawingTurtle3d === null)
         this.drawingTurtle3d = new DrawingTurtle3D();
       this.drawingTurtle3d.draw(this.state.lstring);
@@ -157,7 +156,7 @@ class ControlPanel extends Component {
     this.setState({ [name]: value });
     if (name === 'iterations') {
       this.generator.setIterations(value);
-      let lstring = this.generator.generateLString(this.state.axiom, this.state.frule);
+      let lstring = this.generator.generateLString(this.state.axiom, this.state.frule, this.state.xrule);
       this.setState({ lstring: lstring });
     }
 
@@ -247,7 +246,7 @@ class ControlPanel extends Component {
       };
 
     let stats = this.state.stats ? Object.keys(this.state.stats).map((key) => {
-      return <span>{key}: {this.state.stats[key]}  </span>;
+      return <span className="statItem" key={key}>{key}: {this.state.stats[key]}  </span>;
     }) : null;
 
 
@@ -289,9 +288,12 @@ class ControlPanel extends Component {
           <label htmlFor="axiomInput">axiom: </label>
           <input name="axiom" type="text" id="axiomInput"
             onChange={this.handleChange} value={this.state.axiom}/>
-          <label htmlFor="rulesInput">rules: </label>
+          <label htmlFor="rulesInput">f => </label>
           <input name="frule" type="text" id="rulesInput"
             onChange={this.handleChange} value={this.state.frule}/>
+          <label htmlFor="rulesInput">x => </label>
+          <input name="xrule" type="text"
+              onChange={this.handleChange} value={this.state.xrule}/>
           <label htmlFor="iterationsInput">iterations: </label>
           <input name="iterations" type="number" min="1" max="8" id="iterationsInput"
           onChange={this.handleChange} value={this.state.iterations}/>
